@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Login</title>
+</head>
+<body>
+<h2>Login</h2>
+<div>
+    <h3 class="form-header">Register</h3>
+    <form action="/register" method="post">
+        <label>First Name:</label><input type="text" name="firstName" required />
+        <label>Last Name:</label><input type="text" name="lastName" required />
+        <label>Email:</label><input type="email" name="email" required />
+        <label>Gender:</label>
+        <select name="gender" required>
+            <option value="">--Select--</option>
+            <option>Male</option>
+            <option>Female</option>
+            <option>Other</option>
+        </select>
+        <label>Location:</label><input type="text" name="location" required />
+        <label>Marital Status:</label>
+        <select name="maritalStatus" required>
+            <option value="">--Select--</option>
+            <option>Single</option>
+            <option>Divorced</option>
+            <option>Widowed</option>
+        </select>
+        <label>Mobile Number:</label><input type="text" name="mobileNumber" required />
+        <label>Mother Tongue:</label><input type="text" name="motherTonge" required />
+        <label>Religion:</label><input type="text" name="religion" value="Hindu" readonly />
+        <!-- Set Password Field -->
+        <label>Set Password:</label><input type="password" name="password" required />
+        <button type="submit">Submit</button>
+    </form>
+    <p>Already have an account? <button class="toggle-button" onclick="toggleForm('login')">Login Now</button></p>
+</div>
+
+</body>
+</html>

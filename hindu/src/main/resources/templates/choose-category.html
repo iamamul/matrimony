@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Choose Your Category - Hindu Matrimony</title>
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+    <style>
+        /* (same styling you already have, omitted here for brevity) */
+    </style>
+</head>
+<body>
+<h2>Choose Your Membership</h2>
+<div class="container">
+    <div class="category-card">
+        <h3>Basic</h3>
+        <div class="price">Free</div>
+        <p>Access to limited profiles</p>
+        <button onclick="location.href='/subscribe/basic'">Choose Basic</button>
+    </div>
+
+    <div class="category-card">
+        <h3>Premium</h3>
+        <div class="price">₹499 / month</div>
+        <p>View unlimited profiles + messaging</p>
+        <button onclick="initiatePayment('premium', 49900)">Choose Premium</button>
+    </div>
+
+    <div class="category-card">
+        <h3>Premium Plus</h3>
+        <div class="price">₹999 / month</div>
+        <p>Top profile visibility + direct contact</p>
+        <button onclick="initiatePayment('premium-plus', 99900)">Choose Premium Plus</button>
+    </div>
+</div>
+
+<script>
+    function initiatePayment(plan, amount) {
+        fetch('/api/subscription/create-order', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({ amount: amount, plan: plan })
+        })
+        .then(res => res.json())
+        .then(order => {
+            const options = {
+                "key": order.key,
+                "amount": order.amount,
+                "currency": order.currency,
+                "name": "Hindu Matrimony",
+                "description": plan + " Subscription",
+                "order_id": order.orderId,
+                "handler": function (response) {
+                    fetch('/api/subscription/verify', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            razorpay_order_id: response.razorpay_order_id,
+                            razorpay_payment_id: response.razorpay_payment_id,
+                            razorpay_signature: response.razorpay_signature,
+                            plan: plan
+                        })
+                    }).then(res => {
+                        if (res.ok) window.location.href = '/subscription/success';
+                        else alert("Payment verification failed");
+                    });
+                },
+                "theme": { "color": "#FFA500" }
+            };
+            const rzp = new Razorpay(options);
+            rzp.open();
+        });
+    }
+</script>
+</body>
+</html>

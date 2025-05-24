@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Hindu Matrimony - Register</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background-color: #FDF5E6;
+            color: #3E2723;
+            padding: 20px;
+            background-repeat: no-repeat;
+            background-size: cover;
+        }
+
+        h2 {
+            color: #800000;
+            text-align: center;
+        }
+
+        .form-container {
+            background-color: #fff8dc;
+            border: 2px solid #FFA500;
+            border-radius: 10px;
+            padding: 30px;
+            max-width: 500px;
+            margin: auto;
+            box-shadow: 0 0 15px rgba(0,0,0,0.1);
+        }
+
+        label {
+            font-weight: bold;
+            display: block;
+            margin-top: 10px;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 8px;
+            margin-top: 5px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        button {
+            background-color: #FFA500;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            margin-top: 20px;
+            font-size: 16px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #cc8400;
+        }
+
+        .toggle-button {
+            background-color: #3E2723;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            margin-top: 20px;
+            font-size: 14px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .toggle-button:hover {
+            background-color: #2C1917;
+        }
+
+        .form-header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .form-container p {
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+<h2>Hindu Matrimony</h2>
+
+<!-- Login Form Section -->
+<div id="loginForm" class="form-container">
+    <h3 class="form-header">Login</h3>
+    <form action="/custom-login" method="post">
+        <label>Email:</label><input type="email" name="email" required />
+        <label>Password:</label><input type="password" name="password" required />
+        <button type="submit">Login</button>
+    </form>
+    <p>New to Hindu Matrimony? <button class="toggle-button" onclick="toggleForm('register')">Register Now</button></p>
+</div>
+
+<!-- Registration Form Section (Initially hidden) -->
+<div id="registerForm" class="form-container" style="display: none;">
+    <h3 class="form-header">Register</h3>
+    <form action="/register" method="post">
+        <label>First Name:</label><input type="text" name="firstName" required />
+        <label>Last Name:</label><input type="text" name="lastName" required />
+        <label>Email:</label><input type="email" name="email" required />
+        <label>Gender:</label>
+        <select name="gender" required>
+            <option value="">--Select--</option>
+            <option>Male</option>
+            <option>Female</option>
+            <option>Other</option>
+        </select>
+        <label>Location:</label><input type="text" name="location" required />
+        <label>Marital Status:</label>
+        <select name="maritalStatus" required>
+            <option value="">--Select--</option>
+            <option>Single</option>
+            <option>Divorced</option>
+            <option>Widowed</option>
+        </select>
+        <label>Mobile Number:</label><input type="text" name="mobileNumber" required />
+        <label>Mother Tongue:</label><input type="text" name="motherTonge" required />
+        <label>Religion:</label><input type="text" name="religion" value="Hindu" readonly />
+        <!-- Set Password Field -->
+        <label>Set Password:</label><input type="password" name="password" required />
+        <button type="submit">Submit</button>
+    </form>
+    <p>Already have an account? <button class="toggle-button" onclick="toggleForm('login')">Login Now</button></p>
+</div>
+
+<script>
+    // Function to toggle between login and registration form
+    function toggleForm(formType) {
+        if (formType === 'login') {
+            document.getElementById('loginForm').style.display = 'block';
+            document.getElementById('registerForm').style.display = 'none';
+        } else {
+            document.getElementById('loginForm').style.display = 'none';
+            document.getElementById('registerForm').style.display = 'block';
+        }
+    }
+</script>
+</body>
+</html>

@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <title>Subscribe</title>
+  <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+</head>
+<body>
+
+<h2>Confirm Your Subscription</h2>
+<p>Amount: ₹999</p>
+
+<button id="rzp-button">Pay Now</button>
+
+<script>
+  var options = {
+      "key": /*[[${razorpayKey}]]*/, // Razorpay key ID
+      "amount": /*[[${amount}]]*/, // in paise
+      "currency": "INR",
+      "name": "Matrimony Site",
+      "description": "Premium Subscription",
+      "order_id": /*[[${orderId}]]*/,
+      "handler": function (response) {
+          fetch("/verify-payment", {
+              method: "POST",
+              headers: {'Content-Type': 'application/json'},
+              body: JSON.stringify(response)
+          })
+          .then(res => {
+              if (res.ok) window.location.href = "/subscription/success";
+              else alert("Payment verification failed");
+          });
+      },
+      "prefill": {
+          "name": "Your Name",
+          "email": "user@example.com",
+          "contact": "9999999999"
+      },
+      "theme": { "color": "#528FF0" }
+  };
+
+  document.getElementById('rzp-button').onclick = function () {
+      var rzp = new Razorpay(options);
+      rzp.open();
+  };
+</script>
+
+</body>
+</html>

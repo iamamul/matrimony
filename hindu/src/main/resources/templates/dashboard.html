@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <title>User Dashboard</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #fff8f2;
+            color: #4b2e2e;
+            margin: 0;
+            padding: 0;
+        }
+
+        h2 {
+            text-align: center;
+            background-color: #f2d8c2;
+            padding: 20px;
+            margin: 0;
+            border-bottom: 2px solid #e6b89c;
+        }
+
+        .dashboard-wrapper {
+            max-width: 1200px;
+            margin: 30px auto;
+            border: 1px solid #e6b89c;
+            border-radius: 10px;
+            background-color: #ffffff;
+            box-shadow: 0 0 10px rgba(139, 69, 19, 0.1);
+            overflow: hidden;
+        }
+
+        .header-bar {
+            background-color: #f2d8c2;
+            padding: 15px 20px;
+            font-size: 20px;
+            font-weight: bold;
+            border-bottom: 2px solid #e6b89c;
+        }
+
+        .dashboard-container {
+            display: flex;
+        }
+
+        .left-panel {
+            width: 30%;
+            background-color: #fef0e6;
+            padding: 30px;
+            box-sizing: border-box;
+            border-right: 1px solid #e6b89c;
+            text-align: center;
+        }
+
+        .left-panel img {
+            width: 100%;
+            max-width: 180px;
+            height: auto;
+            border-radius: 10px;
+            object-fit: cover;
+            border: 2px solid #e6b89c;
+            margin-bottom: 20px;
+        }
+
+        .left-panel input[type="file"] {
+            margin-top: 10px;
+            width: 100%;
+        }
+
+        .right-panel {
+            width: 70%;
+            padding: 30px;
+            box-sizing: border-box;
+        }
+
+        section {
+            margin-bottom: 30px;
+            padding: 15px;
+            border: 1px solid #f3d1b8;
+            border-radius: 8px;
+            background-color: #fffaf7;
+        }
+
+        h3 {
+            color: #8b3e2d;
+            border-bottom: 1px solid #e6b89c;
+            padding-bottom: 5px;
+            margin-bottom: 10px;
+        }
+
+        label {
+            font-weight: 500;
+            display: block;
+            margin-top: 10px;
+        }
+
+        input[readonly],
+        input[disabled] {
+            background-color: #f7f3ef;
+            cursor: not-allowed;
+        }
+
+        input[type="text"],
+        input[type="date"],
+        input[type="url"],
+        input[type="number"],
+        input[type="file"],
+        input[type="checkbox"],
+        input[type="radio"] {
+            width: 100%;
+            padding: 8px;
+            margin-top: 6px;
+            border: 1px solid #d9bba0;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+
+        .edit-icon {
+            cursor: pointer;
+            color: #a84f3c;
+            font-size: 18px;
+            float: right;
+        }
+
+        button {
+            background-color: #8b3e2d;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+
+        button:hover {
+            background-color: #a84f3c;
+        }
+
+        .profile-list {
+            margin-top: 20px;
+        }
+
+        .profile-item {
+            border: 1px solid #e6b89c;
+            padding: 10px;
+            margin-bottom: 15px;
+            border-radius: 8px;
+            background-color: #fffaf7;
+        }
+
+        .profile-item p {
+            margin: 5px 0;
+        }
+
+        .pagination {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .pagination a {
+            padding: 5px 15px;
+            background-color: #f2d8c2;
+            margin: 0 5px;
+            text-decoration: none;
+            border-radius: 5px;
+        }
+
+        .pagination a:hover {
+            background-color: #a84f3c;
+            color: white;
+        }
+    </style>
+
+    <script>
+        function enableSectionEdit(sectionId) {
+            const section = document.getElementById(sectionId);
+            const inputs = section.querySelectorAll('input');
+            inputs.forEach(input => {
+                if (input.type !== 'radio' && input.type !== 'file') {
+                    input.removeAttribute('readonly');
+                } else if (input.type === 'radio') {
+                    input.removeAttribute('disabled');
+                }
+            });
+        }
+    </script>
+</head>
+<body>
+
+<div class="dashboard-wrapper">
+    <div class="header-bar">
+        Search for Matches
+    </div>
+
+    <form th:action="@{/search}" method="get" style="padding: 20px;">
+        <label>Minimum Age:</label>
+        <input type="number" name="minAge" placeholder="e.g. 25" />
+
+        <label>Maximum Age:</label>
+        <input type="number" name="maxAge" placeholder="e.g. 35" />
+
+        <label>City:</label>
+        <input type="text" name="city" placeholder="e.g. Mumbai" />
+
+        <button type="submit">Search</button>
+    </form>
+</div>
+
+<div class="dashboard-wrapper">
+    <div class="header-bar" sec:authorize="isAuthenticated()">
+        Welcome <span sec:authentication="name"></span>!
+    </div>
+
+    <form th:action="@{/saveProfile}" method="post" enctype="multipart/form-data" th:object="${userDashBoard}">
+        <input type="hidden" name="newUserId" th:value="${userDashBoard.newUser.id}" />
+
+        <div class="dashboard-container">
+            <div class="left-panel">
+                <img th:src="@{'/user-photos/' + ${userDashBoard.id}}" alt="Profile Picture" th:if="*{photo != null}" />
+                <label>Upload Photo:</label>
+                <input type="file" name="photo" />
+            </div>
+
+            <div class="right-panel">
+
+                <section id="basicInfo">
+                    <h3>Basic Information <span class="edit-icon" onclick="enableSectionEdit('basicInfo')">✎</span></h3>
+                    <label>Date of Birth:</label>
+                    <input type="date" th:field="*{dob}" readonly />
+                </section>
+
+                <section id="educationInfo">
+                    <h3>Education Info <span class="edit-icon" onclick="enableSectionEdit('educationInfo')">✎</span></h3>
+                    <label>Degree:</label>
+                    <input type="text" th:field="*{degree}" readonly />
+                    <label>Institute:</label>
+                    <input type="text" th:field="*{institute}" readonly />
+                    <label>LinkedIn Profile:</label>
+                    <input type="url" th:field="*{linkedInProfile}" readonly />
+                </section>
+
+                <section id="physicalAttributes">
+                    <h3>Physical Attributes <span class="edit-icon" onclick="enableSectionEdit('physicalAttributes')">✎</span></h3>
+                    <label>Height (ft):</label>
+                    <input type="number" step="0.1" th:field="*{height}" readonly />
+                    <label>Weight (kg):</label>
+                    <input type="number" th:field="*{weight}" readonly />
+                    <label>Hair Color:</label>
+                    <input type="text" th:field="*{hairColor}" readonly />
+                    <label>Face Color:</label>
+                    <input type="text" th:field="*{faceColor}" readonly />
+                    <label>Blood Group:</label>
+                    <input type="text" th:field="*{bloodGroup}" readonly />
+                    <label>Disability:</label>
+                    <label><input type="radio" th:field="*{disability}" th:value="true" disabled /> Yes</label>
+                    <label><input type="radio" th:field="*{disability}" th:value="false" disabled /> No</label>
+                </section>
+
+                <section id="presentAddress">
+                    <h3>Present Address <span class="edit-icon" onclick="enableSectionEdit('presentAddress')">✎</span></h3>
+                    <label>Country:</label>
+                    <input type="text" th:field="*{country}" readonly />
+                    <label>State:</label>
+                    <input type="text" th:field="*{state}" readonly />
+                    <label>City:</label>
+                    <input type="text" th:field="*{city}" readonly />
+                    <label>Postal Code:</label>
+                    <input type="text" th:field="*{postalCode}" readonly />
+                </section>
+
+                <section id="residentInfo">
+                    <h3>Resident Info <span class="edit-icon" onclick="enableSectionEdit('residentInfo')">✎</span></h3>
+                    <label>Current Address:</label>
+                    <input type="text" th:field="*{currentAddress}" readonly />
+                    <label>Permanent Address:</label>
+                    <input type="text" th:field="*{permanentAddress}" readonly />
+                </section>
+
+                <section id="career">
+                    <h3>Career <span class="edit-icon" onclick="enableSectionEdit('career')">✎</span></h3>
+                    <label>Designation:</label>
+                    <input type="text" th:field="*{designation}" readonly />
+                    <label>Company:</label>
+                    <input type="text" th:field="*{company}" readonly />
+                    <label>Company Country:</label>
+                    <input type="text" th:field="*{companyCountry}" readonly />
+                    <label>Company State:</label>
+                    <input type="text" th:field="*{companyState}" readonly />
+                    <label>Company City:</label>
+                    <input type="text" th:field="*{companyCity}" readonly />
+                    <label>Salary Package (Optional):</label>
+                    <input type="text" th:field="*{salary}" readonly />
+                </section>
+
+                <section id="otherInfo">
+                    <h3>Other Information <span class="edit-icon" onclick="enableSectionEdit('otherInfo')">✎</span></h3>
+                    <label>Languages Known:</label>
+                    <input type="text" th:field="*{languagesKnown}" readonly />
+                    <label>Interests:</label>
+                    <input type="text" th:field="*{interests}" readonly />
+                </section>
+
+                <section id="familyInfo">
+                    <h3>Family Information <span class="edit-icon" onclick="enableSectionEdit('familyInfo')">✎</span></h3>
+                    <label>Father's Name:</label>
+                    <input type="text" th:field="*{fatherName}" readonly />
+                    <label>Mother's Name:</label>
+                    <input type="text" th:field="*{motherName}" readonly />
+                    <label>Siblings:</label>
+                    <input type="text" th:field="*{siblings}" readonly />
+                </section>
+
+                <button type="submit">Save Changes</button>
+
+            </div>
+
+
+        </div>
+    </form>
+</div>
+
+</body>
+</html>
