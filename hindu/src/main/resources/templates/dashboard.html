@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.w3.org/1999/xhtml">
 <head>
     <title>User Dashboard</title>
     <style>
@@ -203,11 +203,24 @@
 
         <button type="submit">Search</button>
     </form>
+
+    <!-- Display Profiles -->
+    <div th:if="${profiles != null}">
+        <h3>Search Results:</h3>
+        <div th:each="profile : ${profiles}">
+            <div>
+                <h4 th:text="${(profile.newUser.firstName ?: '') + ' ' + (profile.newUser.lastName ?: '')}"></h4>
+                <p th:text="'Age: ' + (profile.age != null ? profile.age : 'N/A')"></p>
+                <p th:text="'City: ' + (profile.city ?: 'N/A')"></p>
+            </div>
+            <hr />
+        </div>
+    </div>
 </div>
 
 <div class="dashboard-wrapper">
     <div class="header-bar" sec:authorize="isAuthenticated()">
-        Welcome <span sec:authentication="name"></span>!
+        Welcome <span sec:authentication="name"></span>! <span th:text="${age}">Age</span>
     </div>
 
     <form th:action="@{/saveProfile}" method="post" enctype="multipart/form-data" th:object="${userDashBoard}">

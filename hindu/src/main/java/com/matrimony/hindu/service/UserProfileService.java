@@ -11,9 +11,11 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.time.Period;
 import java.util.Base64;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class UserProfileService {
@@ -86,5 +88,20 @@ public class UserProfileService {
         // Find UserDashBoard by NewUser id
         return userDashBoardRepository.findByNewUserId(newUser.getId())
                 .orElse(new UserDashBoard()); // Or throw exception or handle empty case
+    }
+
+    public List<UserDashBoard> searchFilteredUsers(Integer minAge, Integer maxAge, String city, String gender, Long currentUserId) {
+        List<UserDashBoard> allProfiles = userDashBoardRepository.findAll();
+
+        return allProfiles.stream()
+                .filter(p -> p.getNewUser().getId() != currentUserId) // Exclude self
+                .filter(p -> p.getNewUser().getGender().equalsIgnoreCase(gender)) // Opposite gender
+                .filter(p -> {
+                    int age = Period.between(p.getDob(), LocalDate.now()).getYears();
+                    return (minAge == null || age >= minAge) &&
+                            (maxAge == null || age <= maxAge);
+                })
+                .filter(p -> city == null || city.isBlank() || p.getCity().equalsIgnoreCase(city))
+                .collect(Collectors.toList());
     }
 }

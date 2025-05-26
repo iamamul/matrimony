@@ -69,4 +69,7 @@ public class UserDashBoard {
     private String siblings;
     private boolean disability;
     private String salary; // Optional package info
+
+    @Transient
+    private int age;
 }

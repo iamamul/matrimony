@@ -7,6 +7,8 @@ import com.matrimony.hindu.entity.NewUser;
 import com.matrimony.hindu.entity.UserDashBoard;
 import com.matrimony.hindu.service.UserProfileService;
 import jakarta.servlet.http.HttpSession;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -18,6 +20,8 @@ import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
+import java.time.LocalDate;
+import java.time.Period;
 import java.util.List;
 
 @Controller
@@ -31,6 +35,8 @@ public class UserProfileController {
 
     @Autowired
     private UserDashBoardRepository userDashBoardRepository;
+
+    private static final Logger logger = LoggerFactory.getLogger(UserProfileController.class);
 
     @InitBinder
     public void initBinder(WebDataBinder binder) {
@@ -144,13 +150,13 @@ public class UserProfileController {
         return new ResponseEntity<>(image, headers, HttpStatus.OK);
     }
 
-    @GetMapping("/search")
+    /*@GetMapping("/search")
     public String showSearchPage(Model model) {
         model.addAttribute("searchDTO", new ProfileSearchDTO());
         return "search"; // points to search.html
-    }
+    }*/
 
-    @PostMapping("/search")
+    /*@PostMapping("/search")
     public String searchProfiles(@ModelAttribute("searchDTO") ProfileSearchDTO searchDTO,
                                  Model model,
                                  Principal principal) {
@@ -162,5 +168,42 @@ public class UserProfileController {
         List<UserDashBoard> results = userProfileService.searchMatchingProfiles(currentGender, searchDTO);
         model.addAttribute("results", results);
         return "dashboard";
+    }*/
+
+    @GetMapping("/search")
+    public String searchMatches(@RequestParam(required = false) Integer minAge,
+                                @RequestParam(required = false) Integer maxAge,
+                                @RequestParam(required = false) String city,
+                                Model model,
+                                Principal principal) {
+
+        // Get logged-in user
+
+        logger.info("Inside search > ");
+        String email = principal.getName();
+        NewUser currentUser = repo.findByEmail(email);
+        logger.info("Inside search > currentUser >" +currentUser);
+
+        int age = Period.between(currentUser.getUserDashBoard().getDob(), LocalDate.now()).getYears();
+
+        logger.info("Inside search > age >" +age);
+        model.addAttribute("age", age);
+
+        String oppositeGender = currentUser.getGender().equalsIgnoreCase("male") ? "female" : "male";
+        logger.info("Inside search > oppositeGender >" +oppositeGender);
+
+        List<UserDashBoard> filteredProfiles = userProfileService.searchFilteredUsers(
+                minAge, maxAge, city, oppositeGender, currentUser.getId());
+
+        logger.info("Inside search > filteredProfiles >" +filteredProfiles);
+
+        // Calculate age for each profile
+        for (UserDashBoard p : filteredProfiles) {
+            int profileAge = Period.between(p.getDob(), LocalDate.now()).getYears();
+            p.setAge(profileAge);
+        }
+
+        model.addAttribute("profiles", filteredProfiles);
+        return "dashboard"; // your dashboard HTML
     }
 }

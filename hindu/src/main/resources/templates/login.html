@@ -2,25 +2,93 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
   <title>Login</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #fdf5e6; /* light saffron shade */
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+    }
+
+    .login-container {
+      background-color: #ffffff;
+      padding: 30px 40px;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      width: 100%;
+      max-width: 400px;
+    }
+
+    h2 {
+      text-align: center;
+      color: #d35400; /* deep saffron */
+      margin-bottom: 25px;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 6px;
+      font-weight: bold;
+      color: #444;
+    }
+
+    input[type="email"],
+    input[type="password"] {
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 15px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      font-size: 14px;
+    }
+
+    button {
+      width: 100%;
+      padding: 10px;
+      background-color: #d35400;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+
+    button:hover {
+      background-color: #b84300;
+    }
+
+    .error {
+      margin-top: 15px;
+      color: red;
+      text-align: center;
+      font-size: 14px;
+    }
+  </style>
 </head>
 <body>
-<h2>Login</h2>
-<form th:action="@{/login}" method="post">
-  <div>
-    <label>Email:</label>
-    <input type="email" name="username" required />
-  </div>
-  <div>
-    <label>Password:</label>
-    <input type="password" name="password" required />
-  </div>
-  <div>
-    <button type="submit">Login</button>
-  </div>
-</form>
+<div class="login-container">
+  <h2>Login</h2>
+  <form th:action="@{/login}" method="post">
+    <div>
+      <label>Email:</label>
+      <input type="email" name="username" required />
+    </div>
+    <div>
+      <label>Password:</label>
+      <input type="password" name="password" required />
+    </div>
+    <div>
+      <button type="submit">Login</button>
+    </div>
+  </form>
 
-<div th:if="${param.error}">
-  Invalid username or password.
+  <div class="error" th:if="${param.error}">
+    Invalid username or password.
+  </div>
 </div>
 </body>
 </html>
